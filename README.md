@@ -4,7 +4,7 @@ Creates a port mirror inside a GRE tunnel.  Useful when one needs to create a po
 
 ## gretunnel
 
-gretunnel sniifs TCP/UDP packets from an interface and sends them out the same or different interface to the specified destination encapsulated in a GRE header.
+gretunnel sniffs TCP/UDP packets from an interface and sends them out the same or different interface to the specified destination encapsulated in a GRE header.
 ```
 Usage: gretunnel.exe dst-ip src-ip listen-index send-index
          dst-ip         destination IP address
