@@ -438,6 +438,9 @@ int main(int argc, char* argv[])
 
 		while (api.ReadPacket(&Request))
 		{
+			//uncomment if want to send to adapter for wireshark etc
+			//api.SendPacketToAdapter(&Request);
+
 			pEthHeader = (ether_header*)PacketBuffer.m_IBuffer;
 			if ((ntohs(pEthHeader->h_proto) == ETH_P_IP) && (PacketBuffer.m_dwDeviceFlags == PACKET_FLAG_ON_RECEIVE))
 			{
