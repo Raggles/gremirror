@@ -110,7 +110,7 @@ void usage(char *pname)
 	printf("\t src-ip \tsource IP address\n");
 	printf("\t listen-index \tadapter index to listen on\n");
 	printf("\t send-index \tadapter index to send on\n\n");
-
+	printf("\t gw-ip \tgateway ip-required if dst-ip is not on the same network\n\n");
 
 
 	verInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -296,35 +296,49 @@ int main(int argc, char* argv[])
 
 	char *DestIpString = NULL;
 	char *SrcIpString = NULL;
+	char* GatewayIpString = NULL;
 	in_addr SrcIp;
 	in_addr DestIp;
+	in_addr GatewayIp;
 	BYTE *bPhysAddr;
 	unsigned int i;
 
 	if (argc > 4) {
-		DestIpString = argv[1];
+		DestIpString = GatewayIpString = argv[1];
 		SrcIpString = argv[2];
-		if (InetPton(AF_INET, DestIpString, &DestIp) != 1)
-		{
-			printf("Couldn't parse destination ip address\n");
-		}
-		if (InetPton(AF_INET, SrcIpString, &SrcIp) != 1)
-		{
-			printf("Couldn't parse source ip address\n");
-		}
 		iListenIndex = atoi(argv[3]) - 1;
 		iSendIndex = atoi(argv[4]) - 1;
-
 	}
 	else {
 		usage(argv[0]);
 		return 0;
 	}
+	if (argc > 5)
+	{
+		GatewayIpString = argv[5];
+	}
+
+	if (InetPton(AF_INET, DestIpString, &DestIp) != 1)
+	{
+		printf("Couldn't parse destination ip address\n");
+		return EXIT_FAILURE;
+	}
+	if (InetPton(AF_INET, SrcIpString, &SrcIp) != 1)
+	{
+		printf("Couldn't parse source ip address\n");
+		return EXIT_FAILURE;
+	}
+	if (InetPton(AF_INET, GatewayIpString, &GatewayIp) != 1)
+	{
+		printf("Couldn't parse gateway ip address\n");
+		return EXIT_FAILURE;
+	}
+
 	memset(&MacAddr, 0xff, sizeof(MacAddr));
 
-	printf("Sending ARP request for IP address: %s\n", DestIpString);
+	printf("Sending ARP request for IP address: %s\n", GatewayIpString);
 
-	dwRetVal = SendARP(DestIp.S_un.S_addr, SrcIp.S_un.S_addr, &MacAddr, &PhysAddrLen);
+	dwRetVal = SendARP(GatewayIp.S_un.S_addr, SrcIp.S_un.S_addr, &MacAddr, &PhysAddrLen);
 
 	if (dwRetVal == NO_ERROR) {
 		bPhysAddr = (BYTE *)& MacAddr;
